@@ -4,7 +4,7 @@ import db
 
 app = FastAPI(
     title="Trades & Positions API",
-    description="API for trades and nets",
+    description="API for trades and positions",
     version="1.0.0"
 )
 
