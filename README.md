@@ -120,17 +120,3 @@ pytest test_api.py -v
 **Pagination**: Offset-based
 - Simple LIMIT/OFFSET implementation
 - Works well for small-medium datasets
-
-## Trade-offs
-
-**Chose simplicity over scalability:**
-- SQLite instead of Postgres (easier setup, sufficient for demo)
-- Offset pagination instead of cursor (simpler, less efficient at scale)
-- Sync database calls (FastAPI supports async, but adds complexity)
-
-**Production improvements:**
-- Add cursor-based pagination for large datasets
-- Use connection pooling
-- Add caching for positions
-- Implement async database queries
-- Add rate limiting and authentication
