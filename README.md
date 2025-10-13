@@ -1,56 +1,136 @@
+# Trades & Positions API
 
----
+FastAPI-based REST API for querying trades and positions from SQLite database.
 
-## **EXPLANATION:**
+## Setup
 
-This README section includes:
+1. Create virtual environment:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
 
-1. **Setup Instructions** - Step-by-step guide to run your code
-2. **Example API Calls** - Shows the interviewer how to use your API
-3. **Design Notes** - Your thought process and decisions
-4. **Trade-offs** - Shows you understand what you prioritized
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
----
+3. Run the API:
+```bash
+uvicorn api:app --reload
+```
 
-## **What this achieves:**
+Server runs at `http://localhost:8000`
 
-✅ **Shows technical communication skills**
-✅ **Demonstrates understanding of trade-offs**
-✅ **Makes it easy for interviewer to run your code**
-✅ **Gives talking points for the interview**
-✅ **Shows you think about production concerns**
+## API Examples
 
----
+### GET /trades
+Get filtered trades for an account.
 
-**Add this to your README.md file!** 
+**Request:**
+```bash
+curl "http://localhost:8000/trades?account_id=1001&page_size=2"
+```
 
-**Once done, we're COMPLETE! 🎉** 
+**Response:**
+```json
+[
+  {
+    "trade_id": "LX69DO4AKE5U",
+    "account_id": 1001,
+    "symbol": "SOL/USD",
+    "side": "BUY",
+    "price": 145.65,
+    "quantity": 21.8219,
+    "ts": "2025-08-01T00:19:30Z"
+  },
+  {
+    "trade_id": "MBGAB7U3OA87",
+    "account_id": 1001,
+    "symbol": "SOL/USD",
+    "side": "BUY",
+    "price": 146.54,
+    "quantity": 30.1645,
+    "ts": "2025-08-02T10:26:25Z"
+  }
+]
+```
 
-Would you like me to create a final checklist of all deliverables?---
+**Parameters:**
+- `account_id` (required): Account ID
+- `start_time` (optional): ISO-8601 UTC timestamp
+- `end_time` (optional): ISO-8601 UTC timestamp
+- `symbol` (optional): BTC/USD, ETH/USD, or SOL/USD
+- `page_size` (optional): Results per page (default: 20, max: 100)
+- `page` (optional): Page number (default: 1)
 
-## **EXPLANATION:**
+### GET /positions
+Get net positions by symbol for an account.
 
-This README section includes:
+**Request:**
+```bash
+curl "http://localhost:8000/positions?account_id=1001"
+```
 
-1. **Setup Instructions** - Step-by-step guide to run your code
-2. **Example API Calls** - Shows the interviewer how to use your API
-3. **Design Notes** - Your thought process and decisions
-4. **Trade-offs** - Shows you understand what you prioritized
+**Response:**
+```json
+[
+  {
+    "symbol": "BTC/USD",
+    "net_position": 0.4243
+  },
+  {
+    "symbol": "ETH/USD",
+    "net_position": -6.8189
+  },
+  {
+    "symbol": "SOL/USD",
+    "net_position": -93.7545
+  }
+]
+```
 
----
+**Parameters:**
+- `account_id` (required): Account ID
+- `symbol` (optional): Filter by specific symbol
 
-## **What this achieves:**
+## Testing
 
-✅ **Shows technical communication skills**
-✅ **Demonstrates understanding of trade-offs**
-✅ **Makes it easy for interviewer to run your code**
-✅ **Gives talking points for the interview**
-✅ **Shows you think about production concerns**
+Run tests:
+```bash
+pytest test_api.py -v
+```
 
----
+## Design Notes
 
-**Add this to your README.md file!** 
+**Framework**: FastAPI
+- Auto-generated OpenAPI docs at `/docs`
+- Type validation with Pydantic
+- Fast async performance
 
-**Once done, we're COMPLETE! 🎉** 
+**Database**: SQLite with `sqlite3`
+- Single connection per request
+- Indexed queries on `(account_id, ts)` and `(symbol, ts)`
+- Row factory for dict conversion
 
-Would you like me to create a final checklist of all deliverables?
+**Position Calculation**: SQL aggregation
+- `SUM(CASE WHEN side = 'BUY' THEN quantity ELSE -quantity END)`
+- Computed in database for efficiency
+
+**Pagination**: Offset-based
+- Simple LIMIT/OFFSET implementation
+- Works well for small-medium datasets
+
+## Trade-offs
+
+**Chose simplicity over scalability:**
+- SQLite instead of Postgres (easier setup, sufficient for demo)
+- Offset pagination instead of cursor (simpler, less efficient at scale)
+- Sync database calls (FastAPI supports async, but adds complexity)
+
+**Production improvements:**
+- Add cursor-based pagination for large datasets
+- Use connection pooling
+- Add caching for positions
+- Implement async database queries
+- Add rate limiting and authentication
