@@ -119,4 +119,4 @@ pytest test_api.py -v
 
 **Pagination**: Offset-based
 - Simple LIMIT/OFFSET implementation
-- Works well for small-medium datasets
+- Works well for small-medium datasets# trades-api
