@@ -16,6 +16,8 @@ spec:
     spec:
       containers:
       - name: trades-api
+        # Image updated automatically by Jenkins during deployment
+        # Format: <account-id>.dkr.ecr.<region>.amazonaws.com/trades-api:<build-number>
         image: 465915553437.dkr.ecr.us-east-1.amazonaws.com/trades-api:latest
         ports:
         - containerPort: 8000

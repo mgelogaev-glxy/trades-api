@@ -1,122 +1,132 @@
 # Trades & Positions API
 
-FastAPI-based REST API for querying trades and positions from SQLite database.
+Enterprise-grade FastAPI application with full CI/CD pipeline.
 
-## Setup
+## 🏗️ Architecture
 
-1. Create virtual environment:
-```bash
-python3 -m venv venv
-source venv/bin/activate
+```
+Developer → GitHub → Jenkins → ECR → EKS → Production
 ```
 
-2. Install dependencies:
+## 🚀 Features
+
+- ✅ FastAPI REST API
+- ✅ Docker containerization
+- ✅ Automated CI/CD with Jenkins
+- ✅ AWS ECR (Private Docker Registry)
+- ✅ AWS EKS (Kubernetes)
+- ✅ High Availability (3 pods, 2 AZs)
+- ✅ Zero-downtime deployments
+- ✅ Auto-rollback on failure
+- ✅ Load balancer with health checks
+
+## 📋 Prerequisites
+
+- Python 3.11+
+- Docker
+- AWS CLI
+- kubectl
+- Access to AWS account
+
+## 🔧 Local Development
+
 ```bash
+# Install dependencies
 pip install -r requirements.txt
-```
 
-3. Run the API:
-```bash
+# Run locally
 uvicorn api:app --reload
+
+# Access API
+http://localhost:8000
+http://localhost:8000/docs
 ```
 
-Server runs at `http://localhost:8000`
+## 🐳 Docker
 
-## API Examples
-
-### GET /trades
-Get filtered trades for an account.
-
-**Request:**
 ```bash
-curl "http://localhost:8000/trades?account_id=1001&page_size=2"
+# Build image
+docker build -t trades-api .
+
+# Run container
+docker run -p 8000:8000 trades-api
+
+# Test
+curl http://localhost:8000
 ```
 
-**Response:**
-```json
-[
-  {
-    "trade_id": "LX69DO4AKE5U",
-    "account_id": 1001,
-    "symbol": "SOL/USD",
-    "side": "BUY",
-    "price": 145.65,
-    "quantity": 21.8219,
-    "ts": "2025-08-01T00:19:30Z"
-  },
-  {
-    "trade_id": "MBGAB7U3OA87",
-    "account_id": 1001,
-    "symbol": "SOL/USD",
-    "side": "BUY",
-    "price": 146.54,
-    "quantity": 30.1645,
-    "ts": "2025-08-02T10:26:25Z"
-  }
-]
-```
+## ☁️ AWS Deployment
 
-**Parameters:**
-- `account_id` (required): Account ID
-- `start_time` (optional): ISO-8601 UTC timestamp
-- `end_time` (optional): ISO-8601 UTC timestamp
-- `symbol` (optional): BTC/USD, ETH/USD, or SOL/USD
-- `page_size` (optional): Results per page (default: 20, max: 100)
-- `page` (optional): Page number (default: 1)
+### Jenkins Pipeline
 
-### GET /positions
-Get net positions by symbol for an account.
+The CI/CD pipeline automatically:
+1. Pulls code from GitHub
+2. Builds Docker image
+3. Runs tests
+4. Pushes to ECR
+5. Deploys to EKS
 
-**Request:**
+### Manual Deployment
+
 ```bash
-curl "http://localhost:8000/positions?account_id=1001"
+# Deploy to Kubernetes
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
+
+# Check status
+kubectl get pods
+kubectl get service
 ```
 
-**Response:**
-```json
-[
-  {
-    "symbol": "BTC/USD",
-    "net_position": 0.4243
-  },
-  {
-    "symbol": "ETH/USD",
-    "net_position": -6.8189
-  },
-  {
-    "symbol": "SOL/USD",
-    "net_position": -93.7545
-  }
-]
-```
+## 📊 API Endpoints
 
-**Parameters:**
-- `account_id` (required): Account ID
-- `symbol` (optional): Filter by specific symbol
+- `GET /` - Health check
+- `GET /trades` - Get trades data
+- `GET /positions` - Get positions data
+- `GET /version` - API version info
+- `GET /docs` - Interactive API documentation
 
-## Testing
+## 🔒 Security
 
-Run tests:
-```bash
-pytest test_api.py -v
-```
+- IAM roles for authentication (no hardcoded keys)
+- Private ECR registry
+- Environment variables for configuration
+- Secrets managed via AWS Secrets Manager (production)
 
-## Design Notes
+## 📈 Monitoring
 
-**Framework**: FastAPI
-- Auto-generated OpenAPI docs at `/docs`
-- Type validation with Pydantic
-- Fast async performance
+- Kubernetes health checks (liveness & readiness probes)
+- Load balancer health checks
+- CloudWatch logs (optional)
 
-**Database**: SQLite with `sqlite3`
-- Single connection per request
-- Indexed queries on `(account_id, ts)` and `(symbol, ts)`
-- Row factory for dict conversion
+## 🛠️ Infrastructure
 
-**Position Calculation**: SQL aggregation
-- `SUM(CASE WHEN side = 'BUY' THEN quantity ELSE -quantity END)`
-- Computed in database for efficiency
+- **Jenkins**: CI/CD automation
+- **ECR**: Docker image registry
+- **EKS**: Kubernetes cluster (2 nodes, t3.small)
+- **Load Balancer**: AWS Classic Load Balancer
+- **Networking**: VPC with public subnets in 2 AZs
 
-**Pagination**: Offset-based
-- Simple LIMIT/OFFSET implementation
-- Works well for small-medium datasets# trades-api
+## 📝 Environment Variables
+
+See `.env.example` for required environment variables.
+
+**NEVER commit `.env` to git!**
+
+## 🤝 Contributing
+
+1. Create feature branch
+2. Make changes
+3. Push to GitHub
+4. Jenkins automatically deploys!
+
+## 📚 Documentation
+
+See `/learning/ci-cd/` for detailed documentation:
+- `jenkins-docker-ecr-complete-guide.md` - CI/CD setup
+- `eks-basics.md` - Kubernetes fundamentals
+- `k8s.md` - Complete project walkthrough
+
+## 👨‍💻 Author
+
+Built with ❤️ using modern DevOps practices

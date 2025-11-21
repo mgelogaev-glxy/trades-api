@@ -2,11 +2,14 @@ pipeline {
     agent any
     
     environment {
-        AWS_ACCOUNT_ID = '465915553437'
+        // These values are now sanitized - actual values configured in Jenkins
         AWS_REGION = 'us-east-1'
-        ECR_REGISTRY = '465915553437.dkr.ecr.us-east-1.amazonaws.com'
         ECR_REPOSITORY = 'trades-api'
         IMAGE_TAG = "${BUILD_NUMBER}"
+        
+        // Constructed from Jenkins environment or EC2 metadata
+        AWS_ACCOUNT_ID = sh(script: 'aws sts get-caller-identity --query Account --output text', returnStdout: true).trim()
+        ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
         EKS_CLUSTER = 'trades-api-cluster'
     }
     
