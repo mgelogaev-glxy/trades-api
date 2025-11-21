@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trades-api
+  labels:
+    app: trades-api
+spec:
+  replicas: 3  # Run 3 copies of your API
+  selector:
+    matchLabels:
+      app: trades-api
+  template:
+    metadata:
+      labels:
+        app: trades-api
+    spec:
+      containers:
+      - name: trades-api
+        image: 465915553437.dkr.ecr.us-east-1.amazonaws.com/trades-api:latest
+        ports:
+        - containerPort: 8000
+          name: http
+        env:
+        - name: PORT
+          value: "8000"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5

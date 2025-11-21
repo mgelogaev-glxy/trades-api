@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: trades-api-service
+  labels:
+    app: trades-api
+spec:
+  type: LoadBalancer  # Creates AWS Load Balancer automatically
+  selector:
+    app: trades-api
+  ports:
+  - port: 80          # External port (what users access)
+    targetPort: 8000  # Internal port (your container)
+    protocol: TCP
+    name: http

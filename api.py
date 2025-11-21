@@ -16,7 +16,6 @@ def root():
         "status":"running"
     }
 
-
 @app.get("/trades", response_model=List[Dict])
 def get_trades(
     account_id: int = Query(..., description="Account ID (required)"),
@@ -38,7 +37,6 @@ def get_trades(
         return trades
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
 
 @app.get("/positions", response_model=List[Dict])
 def get_positions(
@@ -53,3 +51,12 @@ def get_positions(
         return positions
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/version")
+def get_version():
+    return {
+        "version": "2.0",
+        "build": "automated",
+        "deployed_via": "Jenkins CI/CD",
+        "kubernetes": "EKS"
+    }
